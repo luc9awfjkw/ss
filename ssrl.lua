@@ -103,7 +103,6 @@ local TARGET_SHAPE = Enum.PartType.Ball
 
 local isEnabled = false
 local motorsDisabled = false
-local mode = "legs"
 
 local localPlayer = Players.LocalPlayer
 local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
@@ -243,11 +242,8 @@ end
 
 local function disableMotors()
     if motorsDisabled then return end
-    if (mode == "legs" or mode == "both") and leftHipMotor and rightHipMotor then
+    if leftHipMotor and rightHipMotor then
         leftHipMotor.Enabled, rightHipMotor.Enabled = false, false
-    end
-    if (mode == "arms" or mode == "both") and leftShoulderMotor and rightShoulderMotor then
-        leftShoulderMotor.Enabled, rightShoulderMotor.Enabled = false, false
     end
     motorsDisabled = true
 end
@@ -257,25 +253,16 @@ local function enableMotors()
     if leftHipMotor and rightHipMotor then
         leftHipMotor.Enabled, rightHipMotor.Enabled = true, true
     end
-    if leftShoulderMotor and rightShoulderMotor then
-        leftShoulderMotor.Enabled, rightShoulderMotor.Enabled = true, true
-    end
     motorsDisabled = false
 end
 
 local function moveLimbsToBall()
     if not (isEnabled and currentBall and currentBall.Parent) then return end
-    if (mode == "legs" or mode == "both") and leftLeg and rightLeg then
+    if leftLeg and rightLeg then
         local leftOffset = getRandomOffset(_G.FootOffsetRadius)
         local rightOffset = getRandomOffset(_G.FootOffsetRadius)
         leftLeg.CFrame = currentBall.CFrame * CFrame.new(leftOffset)
         rightLeg.CFrame = currentBall.CFrame * CFrame.new(rightOffset)
-    end
-    if (mode == "arms" or mode == "both") and leftArm and rightArm then
-        local leftOffset = getRandomOffset(_G.FootOffsetRadius)
-        local rightOffset = getRandomOffset(_G.FootOffsetRadius)
-        leftArm.CFrame = currentBall.CFrame * CFrame.new(leftOffset)
-        rightArm.CFrame = currentBall.CFrame * CFrame.new(rightOffset)
     end
 end
 
@@ -327,15 +314,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         local trackedCount = 0
         for _ in pairs(FolderTracker) do trackedCount += 1 end
         showNotification("Folder Stats", "Tracking: " .. trackedCount .. " folders\nLocked: " .. (LockedFolder and LockedFolder.Name or "None"), 4)
-    elseif input.KeyCode == Enum.KeyCode.KeypadOne then
-        mode = "legs"
-        showNotification("Mode", "Legs only", 1.5)
-    elseif input.KeyCode == Enum.KeyCode.KeypadTwo then
-        mode = "arms"
-        showNotification("Mode", "Arms only", 1.5)
-    elseif input.KeyCode == Enum.KeyCode.KeypadThree then
-        mode = "both"
-        showNotification("Mode", "Both arms and legs", 1.5)
+
     end
 end)
 
@@ -366,4 +345,4 @@ RunService.RenderStepped:Connect(function()
         enableMotors()
     end
 end)
-showNotification("SSRL Infinite Reach", "Press L to toggle lock. [ and ] for distance. Numpad1/2/3 for mode.", 5)
+showNotification("SSRL Infinite Reach", "Press L to toggle lock. [ and ] for distance.", 5)
